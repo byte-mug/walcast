@@ -33,7 +33,10 @@ func CreateConfig(conf *memberlist.Config,ne *core.NodeEngine, port int) (*rpcdp
 	meta,_ := msgpack.Marshal(ne.Self.Metadata(port))
 	conf.Name = ne.Self.Name
 	conf.Delegate = &fixedDelegate{meta}
-	conf.Events = &ObserverDelegate{ne.Pool.Obs}
+	del := &ObserverDelegate{ne.Pool.Obs}
+	conf.Events = del
+	conf.Merge = del
+	conf.Alive = del
 	disp := new(rpcdp.Dispatcher).Init()
 	disp.Service.Put(core.S_NODEENGINE,gorpc.HandlerFunc(ne.Handle))
 	
