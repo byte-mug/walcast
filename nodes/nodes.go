@@ -27,6 +27,20 @@ type NodeRpc struct{
 	Startup time.Time
 	Group   string
 }
+func (n *NodeRpc) GetName() (string,bool) {
+	if n==nil { return "",false }
+	return n.Name,true
+}
+func (n *NodeRpc) Match(o *NodeRpc) bool {
+	if n==nil || o==nil { return false }
+	return n.Name==o.Name
+}
+func (n *NodeRpc) Metadata(port int) *Metadata{
+	return &Metadata{port,n.Startup,n.Group}
+}
+func (n *Node) Rpc() *NodeRpc {
+	return &NodeRpc{n.Name,n.Startup,n.Group}
+}
 type Metadata struct{
 	RpcPort int
 	Startup time.Time
@@ -42,17 +56,29 @@ func (m *Map) Init() *Map {
 	m.nt = avl.NewWith(utils.StringComparator)
 	return m
 }
-func (m *Map) Add(n *Node) {
+func (m *Map) sAdd(n *Node) {
 	m.sm.Lock(); defer m.sm.Unlock()
-	m.nm.Lock(); defer m.nm.Unlock()
 	m.st.Put(n.Startup,n)
+}
+func (m *Map) nAdd(n *Node) {
+	m.nm.Lock(); defer m.nm.Unlock()
 	m.nt.Put(n.Name,n)
 }
-func (m *Map) Remove(n *Node) {
+func (m *Map) Add(n *Node) {
+	m.sAdd(n)
+	m.nAdd(n)
+}
+func (m *Map) sRemove(n *Node) {
 	m.sm.Lock(); defer m.sm.Unlock()
-	m.nm.Lock(); defer m.nm.Unlock()
 	m.st.Remove(n.Startup)
+}
+func (m *Map) nRemove(n *Node) {
+	m.nm.Lock(); defer m.nm.Unlock()
 	m.nt.Remove(n.Name)
+}
+func (m *Map) Remove(n *Node) {
+	m.sRemove(n)
+	m.nRemove(n)
 }
 func (m *Map) Get(name string) (*Node,bool) {
 	m.nm.RLock(); defer m.nm.RUnlock()
