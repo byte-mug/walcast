@@ -108,7 +108,7 @@ func(ne *NodeEngine) redirectSlaves(n *nodes.NodeRpc) {
 }
 
 
-func(ne *NodeEngine) handle(clientAddr string, request interface{}) (response interface{}) {
+func(ne *NodeEngine) Handle(clientAddr string, request interface{}) (response interface{}) {
 	switch R := request.(type){
 	case requestNodeInfo:
 		ne.stateLk.RLock(); defer ne.stateLk.RUnlock()
