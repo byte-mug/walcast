@@ -23,10 +23,12 @@ func (cp *ConnectionPool) Init() *ConnectionPool {
 	return cp
 }
 func (cp *ConnectionPool) Create(name string) *gorpc.Client {
-	return &gorpc.Client {
+	c := &gorpc.Client {
 		Addr: name,
 		Dial: cp.Obs.Dial,
 	}
+	c.Start()
+	return c
 }
 func (cp *ConnectionPool) peek(name string) (*gorpc.Client,bool) {
 	cp.lock.RLock(); defer cp.lock.RUnlock()
