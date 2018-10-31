@@ -38,6 +38,7 @@ func (cp *ConnectionPool) peek(name string) (*gorpc.Client,bool) {
 func (cp *ConnectionPool) Get(name string) *gorpc.Client {
 	if c,ok := cp.peek(name); ok { return c }
 	cp.lock.Lock(); defer cp.lock.Unlock()
+	if c,ok := cp.conns[name]; ok { return c }
 	c := cp.Create(name)
 	cp.conns[name] = c
 	return c
