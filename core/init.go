@@ -14,6 +14,8 @@ func CreateNodeEngine(name,group string,config IConfig) *NodeEngine {
 	ne := new(NodeEngine)
 	obs := new(nodes.ClusterObserver).Init()
 	obs.Del = ne
+	obs.Name = name
+	obs.Group = group
 	ne.Self.Name = name
 	ne.Self.Group = group
 	ne.Pool.Obs = obs
