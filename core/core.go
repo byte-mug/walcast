@@ -17,6 +17,7 @@ import "github.com/byte-mug/walcast/nodes"
 import "github.com/byte-mug/walcast/rpc"
 //import "github.com/byte-mug/walcast/rpcdp"
 import "sync"
+import "fmt"
 
 type nodeEvent struct{
 	enter bool
@@ -28,6 +29,14 @@ const (
 	MASTER
 	SLAVE
 )
+func (s State) String() string {
+	switch s {
+	case ALONE: return "ALONE"
+	case MASTER: return "MASTER"
+	case SLAVE: return "SLAVE"
+	}
+	return fmt.Sprintf("%d",uint(s))
+}
 
 type IConfig interface{
 	SetNodeNameList(s []interface{})
