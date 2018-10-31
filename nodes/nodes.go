@@ -31,6 +31,10 @@ func (n *NodeRpc) GetName() (string,bool) {
 	if n==nil { return "",false }
 	return n.Name,true
 }
+func (n *NodeRpc) ReprName() (string) {
+	if n==nil { return "<nil>" }
+	return n.Name
+}
 func (n *NodeRpc) Match(o *NodeRpc) bool {
 	if n==nil || o==nil { return false }
 	return n.Name==o.Name

@@ -83,6 +83,7 @@ restart:
 		target = resp2.Master.Name
 		goto restart
 	}
+	if n,ok := ne.master.GetName() ; ok && n==target { return }
 	go func() {
 		ne.hookOff()
 		ne.hookUp(target)
@@ -121,13 +122,15 @@ func(ne *NodeEngine) Handle(clientAddr string, request interface{}) (response in
 		ne.stateLk.Lock(); defer ne.stateLk.Unlock()
 		if ne.master!=nil { return responseHookUp{} }
 		ne.slaves.Put(R.From.Name,R.From)
-		ne.Config.SetNodeNameList(ne.slaves.Keys())
+		ne.allNodes.Put(R.From.Name,nil)
+		ne.Config.SetNodeNameList(ne.allNodes.Keys())
 		ne.dirty = true
 		return responseHookUp{&ne.Self}
 	case requestHookOff:
 		ne.stateLk.Lock(); defer ne.stateLk.Unlock()
 		ne.slaves.Remove(R.From.Name)
-		ne.Config.SetNodeNameList(ne.slaves.Keys())
+		ne.allNodes.Remove(R.From.Name)
+		ne.Config.SetNodeNameList(ne.allNodes.Keys())
 		ne.dirty = true
 		return "done!"
 	case replicate:
@@ -155,5 +158,6 @@ func init(){
 	gorpc.RegisterType(responseHookUp{})
 	
 	gorpc.RegisterType(requestHookOff{})
-	
+	gorpc.RegisterType(replicate{})
+	gorpc.RegisterType(redirect{})
 }

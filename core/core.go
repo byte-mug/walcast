@@ -42,14 +42,17 @@ type NodeEngine struct {
 	dirty    bool
 	master   *nodes.NodeRpc
 	slaves   *avl.Tree
+	allNodes *avl.Tree
 	nodeEvs  chan nodeEvent
 	stateLk  sync.RWMutex
 }
 func(ne *NodeEngine) Init() {
 	ne.Self.Startup = time.Now().UTC()
 	ne.Pool.Init()
-	ne.slaves  = avl.NewWith(utils.StringComparator)
-	ne.nodeEvs = make(chan nodeEvent,16)
+	ne.slaves   = avl.NewWith(utils.StringComparator)
+	ne.allNodes = avl.NewWith(utils.StringComparator)
+	ne.allNodes.Put(ne.Self.Name,nil)
+	ne.nodeEvs  = make(chan nodeEvent,16)
 	go ne.perform()
 }
 func(ne *NodeEngine) State() State {
