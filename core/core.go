@@ -66,7 +66,7 @@ func(ne *NodeEngine) State() State {
 
 func(ne *NodeEngine) perform() {
 	ticker := time.Tick(time.Second)
-	refresh := time.Tick(time.Second)
+	refresh := time.Tick(time.Second*5)
 	for {
 		select {
 		case ev := <- ne.nodeEvs:
@@ -80,7 +80,9 @@ func(ne *NodeEngine) perform() {
 		case <- refresh:
 			switch ne.State() {
 			case ALONE:
-				// TODO hook me up.
+				if nd,ok := ne.Pool.Obs.Map.GetAny(ne.Self.Name); ok && nd!=nil {
+					go ne.hookUp(nd.Name)
+				}
 			case SLAVE:
 				ne.recheck()
 			}

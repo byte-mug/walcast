@@ -9,6 +9,7 @@
 // Cluster (-Config) Management
 package nodes
 
+import "math/rand"
 import avl "github.com/emirpasic/gods/trees/avltree"
 import "github.com/emirpasic/gods/utils"
 import "net"
@@ -83,6 +84,23 @@ func (m *Map) nRemove(n *Node) {
 func (m *Map) Remove(n *Node) {
 	m.sRemove(n)
 	m.nRemove(n)
+}
+func (m *Map) GetAny(name string) (*Node,bool) {
+	m.nm.RLock(); defer m.nm.RUnlock()
+	i := rand.Intn(m.nt.Size())
+	for n := m.nt.Left(); n!=nil ; n = n.Next() {
+		i--
+		if i>0 { continue }
+		v,ok := n.Value.(*Node)
+		if v!=nil { if v.Name==name { continue } }
+		return v,ok
+	}
+	for n := m.nt.Right(); n!=nil ; n = n.Prev() {
+		v,ok := n.Value.(*Node)
+		if v!=nil { if v.Name==name { continue } }
+		return v,ok
+	}
+	return nil,false
 }
 func (m *Map) Get(name string) (*Node,bool) {
 	m.nm.RLock(); defer m.nm.RUnlock()
